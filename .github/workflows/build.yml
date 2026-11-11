@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: xe303c12.zip
-          path: xe303c12.zip
+          path: release/xe303c12.zip
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
           retention-days: 2
         

@@ -13,4 +13,6 @@ format:
 build:
 	bash ./scripts/docker_build.sh || true
 
-.PHONY: check format build
+run: build
+
+.PHONY: check format build run

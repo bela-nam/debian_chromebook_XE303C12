@@ -111,6 +111,8 @@ function format_device() {
 		cp rootfs.tar.xz /mnt/xe303c12/root/
 		cp ./*.sh /mnt/xe303c12/root/
 		cp ./*.bin /mnt/xe303c12/root/
+	else
+		cp ./xfce_install.sh /mnt/xe303c12/root/
 	fi
 	echo "Syncing"
 	sync
@@ -135,7 +137,7 @@ else
 		if [ "$sure" != "yes" ]; then
 			stop "Stopped by the user"
 		fi
-		tar xJf rootfs.tar.xz -C / lib/modules/
+		tar xJf rootfs.tar.xz -C / ./usr/lib/modules/
 		dd if=kernel_emmc_ext4.bin of=/dev/mmcblk0p1
 	else
 		check_tool cgpt

@@ -1,23 +1,24 @@
 Installing Debian on an ARM Chromebook (XE303C12)
 #################################################
 
+:date: 2018-02-25 14:00
+:modified: 2026-10-02 12:00
 :tags: debian, arm, chromebook
-:author: Béla Dang
+:author: bela-nam
 :summary: Debian installation on Samsung's ARM chromebook.
 :forked from: https://github.com/13pgeiser/debian_chromebook_XE303C12
 
 |Build badge|
 
-.. |Build badge| image:: https://github.com/bela-d/debian_chromebook_XE303C12/actions/workflows/build.yml/badge.svg
-   :target: https://github.com/bela-d/debian_chromebook_XE303C12/actions
+.. |Build badge| image:: https://github.com/bela-nam/debian_chromebook_XE303C12/actions/workflows/build.yml/badge.svg
+   :target: https://github.com/bela-nam/debian_chromebook_XE303C12/actions
 
 .. contents::
-
 Work heavily based on Kali ARM scripts: https://gitlab.com/kalilinux/build-scripts/kali-arm
 
-Kernel config taken from: https://github.com/archlinuxarm/PKGBUILDs/tree/master/core/linux-armv7
+Kernel config taken partially from: https://github.com/archlinuxarm/PKGBUILDs/tree/master/core/linux-armv7
 
-I still use the machine as a remote desktop client and I do it rarely. Do not expect much support if it does fit work you!
+I use the machine rarely. Do not expect much support if it does not fit your needs.
 
 **Use at your own risk!**
 
@@ -58,19 +59,19 @@ and let U run any firmware on the machine with the drawback of having at each st
 Once developer mode is enabled, it's possible to enable USB boot:
 
 * Boot the machine (pressing CTRL-D right after power-on).
-* Once chrome is ready, press CTRL-F2
-* Log as chronos with no password.
+* Once chrome is ready, press CTRL-Alt-F2
+* Log as `chronos` with no password.
 * su - # Should give you root access.
 * Enable usb boot with: crossystem dev_boot_usb=1 dev_boot_signed_only=0
 
 For more, look here:
- * Chrome documentation: https://chromium.googlesource.com/chromiumos/docs/+/master/developer_mode.md
+ * Chrome documentation: https://chromium.googlesource.com/chromiumos/docs/+/HEAD/developer_mode.md
  * ArchArm linux: https://archlinuxarm.org/platforms/armv7/samsung/samsung-chromebook
 
-USB stick preparation
-*********************
+USB stick preparation (on a Linux host)
+***************************************
 
-- Download the latest zip archive from the releases page (https://github.com/bela-d/debian_chromebook_XE303C12/releases) and unpack it.
+- Download the latest zip archive from the releases page (https://github.com/bela-nam/debian_chromebook_XE303C12/releases) and unpack it.
 - Open a terminal in the extracted folder
 - plug a USB key to hold the debian installation image
 - run *./install.sh* and select the USB key in the list.
@@ -82,8 +83,8 @@ USB stick preparation
 Boot on USB stick
 *****************
 
-Once the USB key is ready, plug it in the black usb connector (ie USB 2.0) of
-the chromebook . Start it and press ctrl-u (assuming you've already configured the
+Once the USB key is ready, plug it in the **black** usb connector (ie USB 2.0) of
+the chromebook . Start the machine and press ctrl-u (assuming you've already configured the
 developer mode). Wait for the system to boot.
 
 user: root
@@ -116,7 +117,7 @@ Setup a network connection:
 
 Run the provided XFCE installation script::
 
-	./xfce.sh
+	./xfce_install.sh
 
 Wait for the installation to finish and `poweroff` before jumping in your prefered desktop (with power-on and ctrl-d).
 
@@ -137,16 +138,18 @@ The final result is usable but far from production quality.
 1. Currently the machine does not like the reboot much. This leads to a back screen -> shutdown and restart each time.
 2. Change the password!!! ;-)
 3. If the battery of your Chromebook discharged completely, you may loose your developer mode and thus, you are unable to boot from USB or SD card. Basically, using ctrl-U will fail and you will hear 2 beeps. To fix this, please follow this guide: https://dev.chromium.org/chromium-os/developer-information-for-chrome-os-devices/workaround-for-battery-discharge-in-dev-mode 
-4. Plenty of other problems not described here.
+4. **Audio & Thermal Protection**: The XE303C12's Maxim MAX98095 codec has integrated Class-D amplifiers driving miniature 1.5W speakers. Driving the speaker volume too high (> 50%) or using unconstrained mixer gain causes severe clipping and rapid thermal buildup in the audio circuitry. In addition, PulseAudio's default timer-based scheduling (``tsched=1``) causes a 100% CPU runaway on the Exynos I2S driver, generating intense heat on this fanless machine. The scripts automatically configure ``tsched=0`` in PulseAudio and safely cap the speaker volume to <= 40%. **Do not increase speaker volume beyond 50% in alsamixer.**
+5. Plenty of other problems not described here.
 
 Rebuilding locally
 ******************
 
 The scripts have been prepared to work in docker. To rebuild:
  * Install docker for your distro
- * Clone the repository: *git clone https://github.com/bela-d/debian_chromebook_XE303C12.git*
+ * Clone the repository: *git clone https://github.com/bela-nam/debian_chromebook_XE303C12.git*
  * Jump in the folder: *cd debian_chromebook_XE303C12*
- * Call the docker build script: *./scripts/docker_build.sh* and wait a while depending on your machine...
+ * Call make: *make* and wait a while depending on your machine...
 
+The build produces a Debian trixie (kernel 6.12) image.
 Have fun!
 
