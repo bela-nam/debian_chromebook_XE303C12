@@ -1,7 +1,7 @@
 # vim:set ft=dockerfile:
 # Debian base.
 FROM debian:trixie-slim
-MAINTAINER Pascal Geiser <pgeiser@pgeiser.com>
+LABEL maintainer="bela-nam"
 
 RUN echo 'deb-src http://deb.debian.org/debian trixie main' >> /etc/apt/sources.list
 
@@ -47,6 +47,3 @@ RUN set -ex \
 	crossbuild-essential-armhf \
     && apt-get clean \
     && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-
-
-

@@ -197,6 +197,11 @@ sed -i 's/BATT_CPU_GOVERNOR=ondemand/BATT_CPU_GOVERNOR=conservative/' debian_roo
 sed -i 's/LM_AC_CPU_GOVERNOR=ondemand/LM_AC_CPU_GOVERNOR=performance/' debian_root/etc/laptop-mode/conf.d/cpufreq.conf
 sed -i 's/NOLM_AC_CPU_GOVERNOR=ondemand/NOLM_AC_CPU_GOVERNOR=performance/' debian_root/etc/laptop-mode/conf.d/cpufreq.conf
 
+# PulseAudio: disable timer-based scheduling (tsched=0) to prevent 100% CPU lockups and overheating on Exynos I2S
+if [ -f debian_root/etc/pulse/default.pa ]; then
+	sed -i 's/load-module module-udev-detect.*/load-module module-udev-detect tsched=0/' debian_root/etc/pulse/default.pa
+fi
+
 # Create exynos-kernel, /kernel_usb.bin, /kernel_emmc_ext4.bin
 cat <<__EOF__ >debian_root/boot/kernel-exynos.its
 /dts-v1/;
@@ -312,12 +317,25 @@ apt-get clean
 # Wait 1s before starting up the display manager
 sed -i -e 's/\[Service\]/\[Service\]\nExecStartPre=\/usr\/bin\/sleep 1/g' /etc/systemd/system/display-manager.service
 # Configure audio settings.
-amixer cset numid=5,iface=MIXER,name='Headphone Switch' 1
-amixer cset numid=1,iface=MIXER,name='Headphone Volume' 50
-amixer cset numid=43,iface=MIXER,name='Left Speaker Mixer Left DAC1 Switch' 1
-amixer cset numid=52,iface=MIXER,name='Right Speaker Mixer Right DAC1 Switch' 1
-amixer cset numid=31,iface=MIXER,name='Left Headphone Mixer Left DAC1 Switch' 1
-amixer cset numid=38,iface=MIXER,name='Right Headphone Mixer Right DAC1 Switch' 1
+# IMPORTANT: Prevent MAX98095 codec and speaker overheating on XE303C12:
+# 1. Disable timer-based scheduling in PulseAudio (tsched=0) to prevent 100% CPU lockups on Exynos I2S.
+# 2. Use named ALSA controls instead of volatile numids across kernel versions.
+# 3. Cap Speaker Volume safely (<= 40 out of 63, ~40%) to prevent overdriving the Class-D amplifier
+#    and burning out the miniature 1.5W internal speakers.
+if [ -f /etc/pulse/default.pa ]; then
+	sed -i 's/load-module module-udev-detect.*/load-module module-udev-detect tsched=0/' /etc/pulse/default.pa
+fi
+
+CARD="0"
+amixer -c "$CARD" cset name='Left Speaker Mixer Left DAC1 Switch' 1 || true
+amixer -c "$CARD" cset name='Right Speaker Mixer Right DAC1 Switch' 1 || true
+amixer -c "$CARD" cset name='Left Headphone Mixer Left DAC1 Switch' 1 || true
+amixer -c "$CARD" cset name='Right Headphone Mixer Right DAC1 Switch' 1 || true
+amixer -c "$CARD" cset name='Headphone Switch' 1 || true
+amixer -c "$CARD" cset name='Headphone Volume' 50 || true
+amixer -c "$CARD" cset name='Speaker Switch' 1 || true
+amixer -c "$CARD" cset name='Speaker Volume' 40 || true
+alsactl store || true
 EOF
 	chmod +x xe303c12/xfce_install.sh
 	zip -r ./xe303c12.zip xe303c12/
