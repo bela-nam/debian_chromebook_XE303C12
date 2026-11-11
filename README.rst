@@ -4,7 +4,8 @@ Installing Debian on an ARM Chromebook (XE303C12)
 :date: 2018-02-25 14:00
 :modified: 2026-10-02 12:00
 :tags: debian, arm, chromebook
-:author: bela-nam
+:maintainer: bela-nam
+:original author: Pascal Geiser
 :summary: Debian installation on Samsung's ARM chromebook.
 :forked from: https://github.com/13pgeiser/debian_chromebook_XE303C12
 
