@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-26.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
 
       - name: 'Run shfmt check'
         run: make check
@@ -30,7 +30,7 @@ jobs:
         run: make build
 
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: xe303c12.zip
           path: release/xe303c12.zip
