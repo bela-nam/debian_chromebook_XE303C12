@@ -1,49 +1,38 @@
 # Build Debian for XE303C12
-
 name: 'Build and upload artifact'
 
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-26.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
       - name: 'Run shfmt check'
         run: make check
-        
+
       - name: 'Run shellcheck'
         uses: ludeeus/action-shellcheck@master
         with:
           scandir: './scripts'
-        env: 
+        env:
           SHELLCHECK_OPTS: '-s bash'
-        
+
       - name: 'Build'
         run: make build
-      
+
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: xe303c12.zip
           path: release/xe303c12.zip
-          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
           retention-days: 2
-        

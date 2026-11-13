@@ -21,4 +21,3 @@ jobs:
       with:
         artifacts: "release/*"
         token: ${{ secrets.GITHUB_TOKEN }}
-
